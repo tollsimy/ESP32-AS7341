@@ -40,10 +40,6 @@
 #include "driver/i2c.h"
 #include <esp_err.h>
 
-extern uint8_t AS_SDA_PIN;
-extern uint8_t AS_SCL_PIN;
-extern uint8_t AS_I2C_PORT;
-
 /* NOTE: In SPM or SYNS mode, it is recommended to use the ASTATUS register 0x94
 and spectral data register 0x94 to 0xA0. In SYND mode, **it is possible** to use
 register 0x60 to 0x6F for easier implementation.
@@ -252,7 +248,7 @@ typedef enum {
  *  @brief  Struct that stores the states of the AS7341 sensor.
  */
 typedef struct{
-  i2c_config_t conf;
+  uint8_t i2c_port;
   bool init;
   bool enabled;       //AS enabled state
   as7341_mode_t mode;
@@ -285,11 +281,10 @@ typedef struct{
  * data[11] = NIR
  */
 
-void AS_init(ESP32_AS7341 *AS);
-void AS_delete();
+esp_err_t AS_init(ESP32_AS7341 *AS, uint8_t i2c_port);
 void AS_enable(ESP32_AS7341 *AS);
 void AS_disableAll(ESP32_AS7341 *AS);
-void AS_enableSpectralMeasurement(bool enable_measurement);
+void AS_enableSpectralMeasurement(ESP32_AS7341 *AS, bool enable_measurement);
 
 void AS_setMode(ESP32_AS7341 *AS, as7341_mode_t mode);
 void AS_setASTEP(ESP32_AS7341 *AS, uint16_t ASTEP);
@@ -317,8 +312,9 @@ void AS_setThresholdChannel(ESP32_AS7341 *AS, as7341_adc_channel_t channel);
 void AS_read_ADC_Channel(ESP32_AS7341 *AS,as7341_adc_channel_t channel);
 void AS_readAllChannels(ESP32_AS7341 *AS);
 uint16_t AS_getChannel(ESP32_AS7341 *AS, as7341_color_channel_t channel);
-void AS_delayForData(int waitTime);
-bool AS_getIsDataReady();
+void AS_getAllChannels(ESP32_AS7341 *AS, uint16_t data[12]);
+void AS_delayForData(ESP32_AS7341 *AS, int waitTime);
+bool AS_getIsDataReady(ESP32_AS7341 *AS);
 
 // uint16_t AS_detectFlickerHz(void);
 
